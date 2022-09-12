@@ -28,18 +28,24 @@ const getAllTasks = async (req, res) => {
 };
 const getTasksByStatus = async (req, res) => {
   try {
+    const allStatus = ["ACTIVE", "LATE", "CANCELLED", "COMPLETED"];
     const { status } = req.params;
-    status.toUpperCase();
-    console.log(status.toUpperCase());
-    const tasks = await Task.findAll({
-      where: { status },
-    });
-    res.status(200).json({
-      status: "success",
-      data: {
-        tasks,
-      },
-    });
+    if (allStatus.includes(status)) {
+      const tasks = await Task.findAll({
+        where: { status },
+      });
+      res.status(200).json({
+        status: "success",
+        data: {
+          tasks,
+        },
+      });
+    } else {
+      return res.status(400).json({
+        status: "error",
+        message: "This status doesn,t exist",
+      });
+    }
   } catch (error) {
     console.log(error);
   }
@@ -83,7 +89,7 @@ const updateTask = async (req, res) => {
     } else {
       return res.status(400).json({
         status: "error",
-        message: "This task was already finished",
+        message: "This task was already finished or cancelled",
       });
     }
   } catch (error) {
